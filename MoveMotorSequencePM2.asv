@@ -1,0 +1,78 @@
+%%%
+%Script to move the motor one sequence
+%%%
+addpath CalibrationFunctions
+
+Diameter_MS=44e-3;Diameter_MT=24e-3;Diameter_MS_Max=49e-3;
+
+Perimeter_MS=pi*Diameter_MS;Perimeter_MS_Max=pi*Diameter_MS_Max;Perimeter_MT=pi*Diameter_MT;
+MS_StepsPerRev=120000;MT_StepsPerRev=60000;
+SequenceLength=5e-3;
+
+%Calculate Length of spool per step of each motor
+MS_LengthPerSequence=Perimeter_MS/MS_StepsPerRev;
+MS_Max_LengthPerSequence=Perimeter_MS_Max/MS_StepsPerRev;
+MT_LengthPerSequence=Perimeter_MT/MT_StepsPerRev;
+
+%Calculate how many steps you have to move each motor
+MS_Seq_Steps=int32(SequenceLength/MS_LengthPerSequence)
+MS_Max_Seq_Steps=int32(SequenceLength/MS_Max_LengthPerSequence)
+MT_Seq_Steps=int32(SequenceLength/MT_LengthPerSequence)
+
+obj1=SetupCOM('COM5',153600);
+
+%Set spooler tensions
+tic
+SeqA.MT2=MoveMotorMatchADC('MTB',2,1000,20,50,obj1)
+pause(0.1)
+SeqA.MS2=MoveMotorMatchADC('MSB',3,1000,20,50,obj1)
+pause(0.1)
+SeqA.MS1=MoveMotorMatchADC('MSA',1,1000,20,50,obj1)
+pause(0.1)
+toc
+
+data1=query(obj1,'Get TD Weight 1 \n \r');
+TensionOld=sscanf(data1,'%li,%li,%li');
+pause(0.1);
+%Set up motors
+%MSA forward
+data1=query(obj1,'Set MSA MConnect 1 \n \r')
+data1=query(obj1,sprintf('Set MSA Steps %i \n \r',MS_Seq_Steps));
+data1=query(obj1,'Set MSA Speed 500 \n \r')
+data1=query(obj1,'Set MSA Dir 0 \n \r')
+
+%MSB forward
+data1=query(obj1,'Set MSB MConnect 1 \n \r')
+data1=query(obj1,sprintf('Set MSB Steps %i \n \r',MS_Seq_Steps));
+data1=query(obj1,'Set MSB Speed 500 \n \r')
+data1=query(obj1,'Set MSB Dir 1 \n \r')
+
+%MTA forward
+data1=query(obj1,'Set MTA MConnect 1 \n \r')
+data1=query(obj1,sprintf('Set MTA Steps %i \n \r',MT_Seq_Steps));
+data1=query(obj1,'Set MTA Speed 500 \n \r')
+data1=query(obj1,'Set MTA Dir 0 \n \r')
+
+%MTB forward
+data1=query(obj1,'Set MTB MConnect 1 \n \r')
+data1=query(obj1,sprintf('Set MTB Steps %i \n \r',MT_Seq_Steps));
+data1=query(obj1,'Set MTB Speed 500 \n \r')
+data1=query(obj1,'Set MTB Dir 0 \n \r')
+
+%Move MS1
+data1=query(obj1,'Move MSA Motor 1 \n \r')
+pause(0.1);
+
+%Move MT1 and MT2
+data1=query(obj1,'Move MTC Motor 1 \n \r')
+pause(0.3);
+
+%Move MS2
+data1=query(obj1,'Move MSB Motor 1 \n \r')
+pause(0.1);
+data1=query(obj1,'Get TD Weight 1 \n \r')
+TensionNew=sscanf(data1,'%li,%li,%li');
+pause(0.1);
+for i=1:length()
+fprintf('New ADC is %i, previous ADC is %i \n',TensionNew,TensionOld)
+

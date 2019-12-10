@@ -1,0 +1,6 @@
+Date,PM1SeqLength,PM1MS1Corr,PM1MS2Corr,PM1TimeElapsed,PM1NoSequence,PM2SeqLength,PM2MS1Corr,PM2MS2Corr,PM2TimeElapsed,PM2NoSequence,GSN
+ 27-Nov-2017 19:58:42,5,0,5,0,0,1,0,0,0,1,0
+ 27-Nov-2017 20:15:36,5,1,0,5,0,0,0,0,0,1,0
+ 27-Nov-2017 20:15:42,5,1,0,5,0,0,0,0,0,1,0
+ 27-Nov-2017 20:15:45,5,1,0,5,0,0,0,0,0,1,0
+ 27-Nov-2017 20:15:48,5,1,0,5,0,1,0,0,0,1,0
